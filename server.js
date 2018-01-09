@@ -53,7 +53,7 @@
   // =====================================================================================
 
   // A GET route for scraping the COS website
-  app.get("/scrape", function(req, res) {
+  app.get("/api/scrape", function(req, res) {
     // Grab the body of the HTML using axios 
     axios.get("https://consequenceofsound.net/category/news/").then(function(response) {
       // Load response into cheerio
@@ -125,7 +125,6 @@
         res.json(err);
       });
   });
-
 
   // // Route for grabbing a specific Article by id, populate it with it's note
   // app.get("/articles/:id", function(req, res) {
