@@ -16,6 +16,7 @@ var ArticleSchema = new Schema({
     type: String,
     required: true
   },
+  // `subtitlte` is required and of type String
   subtitle: {
     type: String,
     required: true

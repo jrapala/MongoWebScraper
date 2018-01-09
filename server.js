@@ -54,37 +54,77 @@
 
   // A GET route for scraping the COS website
   app.get("/scrape", function(req, res) {
-    // First, we grab the body of the html with request
+    // Grab the body of the HTML using axios 
     axios.get("https://consequenceofsound.net/category/news/").then(function(response) {
-      // Then, we load that into cheerio and save it to $ for a shorthand selector
+      // Load response into cheerio
       var $ = cheerio.load(response.data);
 
-      // Find each div with the "content" class
-      $("div.content").each(function(i, element) {
-        // Save an empty result object
-        var result = {};
+      // Find article (divs with class "content")
+      $(".content").each(function(i, element) {
+        
+        // Check to see if div is not empty
+        var element = $(this).children("h1").length;
 
-        // Add the text and href of every link, and save them as properties of the result object
-        result.title = $(this)
-          .children("a")
-          .text();
-        result.link = $(this)
-          .children("a")
-          .attr("href");
+        // If div is not empty, scrape.
+        if (element > 0) {
 
-        // Create a new Article using the `result` object built from scraping
-        db.Article
-          .create(result)
-          .then(function(dbArticle) {
-            // If we were able to successfully scrape and save an Article, send a message to the client
-            res.send("Scrape Complete");
-          })
-          .catch(function(err) {
-            // If an error occurred, send it to the client
-            res.json(err);
+          // Save an empty result object
+          var result = {};
+
+          // Find article title
+          result.title = $(this).children("h1").children("a").text();
+
+          // Find link to article
+          result.link = $(this).children("h1").children("a").attr("href");
+
+          // Find article subtitle
+          result.subtitle = $(this).children("div.excerpt").children("a").children("p").text();
+        
+          // Create a new Article using the `result` object built from scraping
+          db.Article
+            .create(result)
+            .then(function(dbArticle) {
+              // If we were able to successfully scrape and save an Article, send a message to the client
+              res.send("Scrape Complete");
+            })
+            .catch(function(err) {
+              // If an error occurred, send it to the client
+              res.json(err);
           });
+        }
       });
-    });
+    })
+
+
+
+      // // Find each div with the "content" class
+      // $("div.content").each(function(i, element) {
+      //   // Save an empty result object
+      //   var result = {};
+
+      //   // Add the text and href of every link, and save them as properties of the result object
+      //   result.title = $(this)
+      //     .children("a")
+      //     .text();
+      //   result.link = $(this)
+      //     .children("a")
+      //     .attr("href");
+      //   result.subtitle = $(this)
+      //     .children("a")
+      //     .text();
+
+      //   // Create a new Article using the `result` object built from scraping
+      //   db.Article
+      //     .create(result)
+      //     .then(function(dbArticle) {
+      //       // If we were able to successfully scrape and save an Article, send a message to the client
+      //       res.send("Scrape Complete");
+      //     })
+      //     .catch(function(err) {
+      //       // If an error occurred, send it to the client
+      //       res.json(err);
+      //     });
+      // });
   });
 
   // // Route for getting all Articles from the db
@@ -144,3 +184,5 @@
   app.listen(PORT, function() {
     console.log("App running on port " + PORT + "!");
   });
+
+
