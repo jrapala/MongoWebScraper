@@ -3,6 +3,7 @@ $(document).ready(function() {
   var articleContainer = $(".article-container");
   // Adding event listeners for dynamically generated buttons for deleting articles,
   // pulling up article notes, saving article notes, and deleting article notes
+  $(document).on("click", ".btn.unsave", handleArticleSave);
   $(document).on("click", ".btn.delete", handleArticleDelete);
   $(document).on("click", ".btn.notes", handleArticleNotes);
   $(document).on("click", ".btn.save", handleNoteSave);
@@ -47,19 +48,22 @@ $(document).ready(function() {
     var panel = $(
       [
         "<div class='panel panel-default'>",
-        "<div class='panel-heading'>",
+        "<div class='panel-heading panel-heading-saved'>",
         "<h3>",
         "<a class='article-link' target='_blank' href='" + article.url + "'>",
-        article.headline,
+        article.title,
         "</a>",
-        "<a class='btn btn-danger delete'>",
-        "Delete From Saved",
+        "<a class='btn btn-default unsave'>",
+        "Remove from Saved",
         "</a>",
         "<a class='btn btn-info notes'>Article Notes</a>",
+        "<a class='btn btn-danger delete'>",
+        "Delete Article",
+        "</a>",
         "</h3>",
         "</div>",
         "<div class='panel-body'>",
-        article.summary,
+        article.subtitle,
         "</div>",
         "</div>"
       ].join("")
@@ -124,6 +128,24 @@ $(document).ready(function() {
     }
     // Now append the notesToRender to the note-container inside the note modal
     $(".note-container").append(notesToRender);
+  }
+
+  function handleArticleSave() {
+    // This function is triggered when the user wants to save an article
+    // When we rendered the article initially, we attatched a javascript object containing the headline id
+    // to the element using the .data method. Here we retrieve that.
+    var articleToSave = $(this).parents(".panel").data();
+    articleToSave.saved = false;
+    $.ajax({
+      method: "PUT",
+      url: "/api/update",
+      data: articleToSave
+    }).then(function(data) {
+      if (data.ok) {
+        // Reload page
+        initPage();
+      }
+    });
   }
 
   function handleArticleDelete() {

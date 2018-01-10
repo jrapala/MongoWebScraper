@@ -95,16 +95,13 @@ $(document).ready(function() {
     // to the element using the .data method. Here we retrieve that.
     var articleToSave = $(this).parents(".panel").data();
     articleToSave.saved = true;
-    // Using a patch method to be semantic since this is an update to an existing record in our collection
     $.ajax({
       method: "PUT",
       url: "/api/update",
       data: articleToSave
     }).then(function(data) {
-      // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
-      // (which casts to 'true')
       if (data.ok) {
-        // Run the initPage function again. This will reload the entire list of articles
+        // Reload page
         initPage();
       }
     });

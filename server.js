@@ -131,9 +131,10 @@
       });
   });
 
-  // A PUT route for saving an article
+  // A PUT route for saving/unsaving an article
   app.put("/api/update", function(req, res) {
     var articleId = req.body._id;
+    var articleSaveStatus = req.body.saved;
 
     // Update the article that matches the article id
     db.Article
@@ -141,7 +142,7 @@
           "_id" : articleId
       }, {
         $set: {
-          "saved": true
+          "saved": articleSaveStatus
         }
       })
       .then(function(dbArticle) {

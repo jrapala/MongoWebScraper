@@ -88,10 +88,14 @@ body {
   right: 20px;
 }
 
-.panel.panel-default .panel-heading .btn.delete {
+.panel.panel-default .panel-heading .btn.unsave {
   right: 160px;
 }
 
+.panel.panel-default .panel-heading .btn.delete {
+  right: 100px;
+  top: 70px;
+}
 .panel.panel-default .panel-body {
   font-size: 16px;
 }
@@ -100,6 +104,14 @@ body {
   color: white;
   display: inline-block;
   width: 80%;
+}
+
+.panel.panel-default .panel-heading-saved .article-link {
+  width: 70%;
+}
+
+.panel.panel-default .panel-heading-saved {
+  min-height: 130px;
 }
 
 .footer > .container > p {
