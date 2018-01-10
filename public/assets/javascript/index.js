@@ -3,9 +3,9 @@ $(document).ready(function() {
   // Container where articles go
   var articleContainer = $(".article-container");
   // Event listener for saving an article
-  //$(document).on("click", ".btn.save", handleArticleSave);
+  $(document).on("click", ".btn.save", handleArticleSave);
   // Event listener for scraping new articles
-  //$(document).on("click", ".scrape-new", handleArticleScrape);
+  $(document).on("click", ".scrape-new", handleArticleScrape);
 
   initPage();
 
@@ -60,6 +60,7 @@ $(document).ready(function() {
     );
     // We attach the article's id to the jQuery element
     // We will use this when trying to figure out which article the user wants to save
+    console.log(article._id);
     panel.data("_id", article._id);
     // We return the constructed panel jQuery element
     return panel;
@@ -88,26 +89,26 @@ $(document).ready(function() {
     articleContainer.append(emptyAlert);
   }
 
-  // function handleArticleSave() {
-  //   // This function is triggered when the user wants to save an article
-  //   // When we rendered the article initially, we attatched a javascript object containing the headline id
-  //   // to the element using the .data method. Here we retrieve that.
-  //   var articleToSave = $(this).parents(".panel").data();
-  //   articleToSave.saved = true;
-  //   // Using a patch method to be semantic since this is an update to an existing record in our collection
-  //   $.ajax({
-  //     method: "PUT",
-  //     url: "/api/headlines",
-  //     data: articleToSave
-  //   }).then(function(data) {
-  //     // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
-  //     // (which casts to 'true')
-  //     if (data.ok) {
-  //       // Run the initPage function again. This will reload the entire list of articles
-  //       initPage();
-  //     }
-  //   });
-  // }
+  function handleArticleSave() {
+    // This function is triggered when the user wants to save an article
+    // When we rendered the article initially, we attatched a javascript object containing the headline id
+    // to the element using the .data method. Here we retrieve that.
+    var articleToSave = $(this).parents(".panel").data();
+    articleToSave.saved = true;
+    // Using a patch method to be semantic since this is an update to an existing record in our collection
+    $.ajax({
+      method: "PUT",
+      url: "/api/update",
+      data: articleToSave
+    }).then(function(data) {
+      // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
+      // (which casts to 'true')
+      if (data.ok) {
+        // Run the initPage function again. This will reload the entire list of articles
+        initPage();
+      }
+    });
+  }
 
   function handleArticleScrape() {
     // This function handles the user clicking any "scrape new article" buttons

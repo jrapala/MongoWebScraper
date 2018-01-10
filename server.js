@@ -85,7 +85,12 @@
             .create(result)
             .then(function(dbArticle) {
               // If we were able to successfully scrape and save an Article, send a message to the client
-              res.send("Scrape Complete");
+              if (dbArticle) {
+              } else {
+                "No new articles today. Check back tomorrow!"
+              }
+
+
             })
             .catch(function(err) {
               // If an error occurred, send it to the client
@@ -125,6 +130,52 @@
         res.json(err);
       });
   });
+
+  // A PUT route for saving an article
+  app.put("/api/update", function(req, res) {
+    var articleId = req.body._id;
+
+    // Update the article that matches the article id
+    db.Article
+      .update({
+          "_id" : articleId
+      }, {
+        $set: {
+          "saved": true
+        }
+      })
+      .then(function(dbArticle) {
+        // If we were able to successfully find Articles, send them back to the client
+        res.json(dbArticle);
+      })
+      .catch(function(err) {
+        // If an error occurred, send it to the client
+        res.json(err);
+      });
+  });
+
+
+
+  function handleArticleSave() {
+    // This function is triggered when the user wants to save an article
+    // When we rendered the article initially, we attatched a javascript object containing the headline id
+    // to the element using the .data method. Here we retrieve that.
+    var articleToSave = $(this).parents(".panel").data();
+    articleToSave.saved = true;
+    // Using a patch method to be semantic since this is an update to an existing record in our collection
+    $.ajax({
+      method: "PUT",
+      url: "/api/articles",
+      data: articleToSave
+    }).then(function(data) {
+      // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
+      // (which casts to 'true')
+      if (data.ok) {
+        // Run the initPage function again. This will reload the entire list of articles
+        initPage();
+      }
+    });
+  }  
 
   // // Route for grabbing a specific Article by id, populate it with it's note
   // app.get("/articles/:id", function(req, res) {
