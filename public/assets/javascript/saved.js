@@ -170,7 +170,7 @@ $(document).ready(function() {
     // We grab the id of the article to get notes for from the panel element the delete button sits inside
     var currentArticle = $(this).parents(".panel").data();
     // Grab any notes with this headline/article id
-    $.get("/api/notes/" + currentArticle._id).then(function(data) {
+    $.get("/api/articles/" + currentArticle._id).then(function(data) {
       // Constructing our initial HTML to add to the notes modal
       var modalText = [
         "<div class='container-fluid text-center'>",

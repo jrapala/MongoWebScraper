@@ -45,9 +45,14 @@
   // Set mongoose to leverage built in JavaScript ES6 Promises
   // Connect to the Mongo DB
   mongoose.Promise = Promise;
-  mongoose.connect("mongodb://localhost/CoSWebScraper", {
+  var databaseUri = "mongodb://localhost/CoSWebScraper";
+
+  if (process.env.MONGODB_URI) {
+    mongoose.connect(process.env.MONGODB_URI);
+  } else {
+    mongoose.connect(databaseUri, {
     useMongoClient: true
-  });
+  })};
 
   // Routes  
   // =====================================================================================
@@ -156,11 +161,13 @@
   });
 
   // A GET route for getting article notes
-  app.get("/api/notes/:id", function(req, res) {
+  app.get("/api/articles/:id", function(req, res) {
     var id = req.params.id;
     // Grab every document in the Articles collection
-    db.Note
-      .find({'_id': id })
+    db.Article
+      .findOne({ _id: req.params.id })
+      // ..and populate all of the notes associated with it
+      .populate("note")
       .then(function(dbArticle) {
         // If we were able to successfully find Articles, send them back to the client
         res.json(dbArticle);
