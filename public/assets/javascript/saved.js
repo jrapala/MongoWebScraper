@@ -71,6 +71,7 @@ $(document).ready(function() {
     // We attach the article's id to the jQuery element
     // We will use this when trying to figure out which article the user wants to remove or open notes for
     panel.data("_id", article._id);
+    panel.data("title", article.title);
     // We return the constructed panel jQuery element
     return panel;
   }
@@ -174,7 +175,7 @@ $(document).ready(function() {
       var modalText = [
         "<div class='container-fluid text-center'>",
         "<h4>Notes For Article: ",
-        currentArticle._id,
+        currentArticle.title,
         "</h4>",
         "<hr />",
         "<ul class='list-group note-container'>",
@@ -201,20 +202,17 @@ $(document).ready(function() {
   }
 
   function handleNoteSave() {
-    // This function handles what happens when a user tries to save a new note for an article
-    // Setting a variable to hold some formatted data about our note,
-    // grabbing the note typed into the input box
     var noteData;
+    // Data from form
     var newNote = $(".bootbox-body textarea").val().trim();
-    // If we actually have data typed into the note input field, format it
-    // and post it to the "/api/notes" route and send the formatted noteData as well
+    // If data was inputted, create a note data object and post it to the API
     if (newNote) {
       noteData = {
         _id: $(this).data("article")._id,
         noteText: newNote
       };
-      $.post("/api/notes", noteData).then(function() {
-        // When complete, close the modal
+      $.post("/api/articles", noteData).then(function() {
+        // Close the modal
         bootbox.hideAll();
       });
     }
@@ -227,7 +225,7 @@ $(document).ready(function() {
     var noteToDelete = $(this).data("_id");
     // Perform an DELETE request to "/api/notes/" with the id of the note we're deleting as a parameter
     $.ajax({
-      url: "/api/notes/" + noteToDelete,
+      url: "/api/articles/" + noteToDelete,
       method: "DELETE"
     }).then(function() {
       // When done, hide the modal

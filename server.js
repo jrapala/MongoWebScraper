@@ -155,45 +155,57 @@
       });
   });
 
+  // A GET route for getting article notes
+  app.get("/api/notes/:id", function(req, res) {
+    var id = req.params.id;
+    // Grab every document in the Articles collection
+    db.Note
+      .find({'_id': id })
+      .then(function(dbArticle) {
+        // If we were able to successfully find Articles, send them back to the client
+        res.json(dbArticle);
+      })
+      .catch(function(err) {
+        // If an error occurred, send it to the client
+        res.json(err);
+      });
+  });
 
+  // A POST route for saving article notes
+  app.post("/api/articles", function(req, res) {
+    // Grab every document in the Articles collection
+    db.Note
+      .create(req.body)
+      .then(function(dbNote) {
+        console.log(dbNote);
+        return db.Article.findOneAndUpdate({ _id: dbNote._id }, { note: dbNote._id }, { new: true });
+      })
+      .then(function(dbNote) {
+        // If we were able to successfully find Articles, send them back to the client
+        res.json(dbNote);
+      })
+      .catch(function(err) {
+        // If an error occurred, send it to the client
+        res.json(err);
+      });
+  });
 
-  function handleArticleSave() {
-    // This function is triggered when the user wants to save an article
-    // When we rendered the article initially, we attatched a javascript object containing the headline id
-    // to the element using the .data method. Here we retrieve that.
-    var articleToSave = $(this).parents(".panel").data();
-    articleToSave.saved = true;
-    // Using a patch method to be semantic since this is an update to an existing record in our collection
-    $.ajax({
-      method: "PUT",
-      url: "/api/articles",
-      data: articleToSave
-    }).then(function(data) {
-      // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
-      // (which casts to 'true')
-      if (data.ok) {
-        // Run the initPage function again. This will reload the entire list of articles
-        initPage();
-      }
-    });
-  }  
-
-  // // Route for grabbing a specific Article by id, populate it with it's note
-  // app.get("/articles/:id", function(req, res) {
-  //   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-  //   db.Article
-  //     .findOne({ _id: req.params.id })
-  //     // ..and populate all of the notes associated with it
-  //     .populate("note")
-  //     .then(function(dbArticle) {
-  //       // If we were able to successfully find an Article with the given id, send it back to the client
-  //       res.json(dbArticle);
-  //     })
-  //     .catch(function(err) {
-  //       // If an error occurred, send it to the client
-  //       res.json(err);
-  //     });
-  // });
+  // Route for grabbing a specific Article by id, populate it with it's note
+  app.get("/articles/:id", function(req, res) {
+    // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
+    db.Article
+      .findOne({ _id: req.params.id })
+      // ..and populate all of the notes associated with it
+      .populate("note")
+      .then(function(dbArticle) {
+        // If we were able to successfully find an Article with the given id, send it back to the client
+        res.json(dbArticle);
+      })
+      .catch(function(err) {
+        // If an error occurred, send it to the client
+        res.json(err);
+      });
+  });
 
   // // Route for saving/updating an Article's associated Note
   // app.post("/articles/:id", function(req, res) {
