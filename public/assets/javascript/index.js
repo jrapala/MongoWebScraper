@@ -14,7 +14,6 @@ $(document).ready(function() {
     articleContainer.empty();
     $.get("/api/articles/saved/false").then(function(data) {
       // If we have articles, render them to the page
-      console.log(data);
       if (data && data.length) {
         renderArticles(data);
       }
@@ -32,7 +31,7 @@ $(document).ready(function() {
       articleArray.push(createPanel(articles[i]));
     }
 
-    articleContainer.append(articleArray);
+    articleContainer.prepend(articleArray);
   }
 
   function createPanel(article) {
@@ -60,7 +59,6 @@ $(document).ready(function() {
     );
     // We attach the article's id to the jQuery element
     // We will use this when trying to figure out which article the user wants to save
-    console.log(article._id);
     panel.data("_id", article._id);
     // We return the constructed panel jQuery element
     return panel;
@@ -109,12 +107,13 @@ $(document).ready(function() {
 
   function handleArticleScrape() {
     // This function handles the user clicking any "scrape new article" buttons
-    $.get("/api/scrape").then(function(data) {
+    $.get("/api/scrape").then(function(res) {
       // If we are able to succesfully scrape the NYTIMES and compare the articles to those
       // already in our collection, re render the articles on the page
       // and let the user know how many unique articles we were able to save
       initPage();
-      bootbox.alert("<h3 class='text-center m-top-80'>" + data.message + "<h3>");
+      console.log(res);
+      bootbox.alert("<h3 class='text-center m-top-80'>" + res + "<h3>");
     });
   }
 });

@@ -63,6 +63,7 @@
     axios.get("https://consequenceofsound.net/category/news/").then(function(response) {
       // Load response into cheerio
       var $ = cheerio.load(response.data);
+      var count = 0;
 
       // Find article (divs with class "content")
       $(".content").each(function(i, element) {
@@ -72,6 +73,8 @@
 
         // If div is not empty, scrape.
         if (element > 0) {
+
+          count++;
 
           // Save an empty result object
           var result = {};
@@ -87,20 +90,21 @@
         
           // Create a new Article using the `result` object built from scraping
           db.Article
-            .create(result)
+            .create(result) 
             .then(function(dbArticle) {
               // If we were able to successfully scrape and save an Article, send a message to the client
               if (dbArticle) {
-              } else {
-                "No new articles today. Check back tomorrow!"
+                res.send(`Scrape Complete. ${count} articles added.`);
               }
-
-
             })
             .catch(function(err) {
               // If an error occurred, send it to the client
+              res.send("An error has occurred.");
               res.json(err);
           });
+        // If no new articles, send different message back to the client.
+        } else {
+          res.send("No new articles. Check back again later!");
         }
       });
     })
