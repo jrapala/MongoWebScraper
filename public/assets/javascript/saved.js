@@ -1,22 +1,25 @@
 $(document).ready(function() {
-  // Getting a reference to the article container div we will be rendering all articles inside of
+
+  // Container where articles go
   var articleContainer = $(".article-container");
-  // Adding event listeners for dynamically generated buttons for deleting articles,
-  // pulling up article notes, saving article notes, and deleting article notes
+  // Event listener for unsaving an article
   $(document).on("click", ".btn.unsave", handleArticleSave);
+  // Event listener for deleting an article
   $(document).on("click", ".btn.delete", handleArticleDelete);
+  // Event listener for displaying article notes
   $(document).on("click", ".btn.notes", handleArticleNotes);
+  // Event listener for saving a new article note
   $(document).on("click", ".btn.save", handleNoteSave);
+  // Event listener for deleting an article note
   $(document).on("click", ".btn.note-delete", handleNoteDelete);
 
-  // initPage kicks everything off when the page is loaded
   initPage();
 
   function initPage() {
     // Empty the article container, run an AJAX request for any saved headlines
     articleContainer.empty();
     $.get("/api/articles/saved/true").then(function(data) {
-      // If we have headlines, render them to the page
+      // If we have articles, render them to the page
       if (data && data.length) {
         renderArticles(data);
       }
@@ -27,24 +30,17 @@ $(document).ready(function() {
     });
   }
 
+  // Create a div for each article and add them to the article container
   function renderArticles(articles) {
-    // This function handles appending HTML containing our article data to the page
-    // We are passed an array of JSON containing all available articles in our database
-    var articlePanels = [];
-    // We pass each article JSON object to the createPanel function which returns a bootstrap
-    // panel with our article data inside
+    var articleArray = [];
     for (var i = 0; i < articles.length; i++) {
-      articlePanels.push(createPanel(articles[i]));
+      articleArray.push(createPanel(articles[i]));
     }
-    // Once we have all of the HTML for the articles stored in our articlePanels array,
-    // append them to the articlePanels container
-    articleContainer.append(articlePanels);
+    articleContainer.append(articleArray);
   }
 
   function createPanel(article) {
-    // This functiont takes in a single JSON object for an article/headline
-    // It constructs a jQuery element containing all of the formatted HTML for the
-    // article panel
+    // Create a panel for each saved article/headline
     var panel = $(
       [
         "<div class='panel panel-default'>",
@@ -68,17 +64,15 @@ $(document).ready(function() {
         "</div>"
       ].join("")
     );
-    // We attach the article's id to the jQuery element
-    // We will use this when trying to figure out which article the user wants to remove or open notes for
+    // Add the article ID and title as attributes.
     panel.data("_id", article._id);
     panel.data("title", article.title);
-    // We return the constructed panel jQuery element
+    // Return the panel HTML so it can enter the articles array
     return panel;
   }
 
+  // HTML message if there are no articles to view. 
   function renderEmpty() {
-    // This function renders some HTML to the page explaining we don't have any articles to view
-    // Using a joined array of HTML string data because it's easier to read/change than a concatenated string
     var emptyAlert = $(
       [
         "<div class='alert alert-warning text-center'>",
