@@ -30,14 +30,12 @@ $(document).ready(function() {
     for (var i = 0; i < articles.length; i++) {
       articleArray.push(createPanel(articles[i]));
     }
-
+    // Newest articles on top
     articleContainer.prepend(articleArray);
   }
 
   function createPanel(article) {
-    // This functiont takes in a single JSON object for an article/headline
-    // It constructs a jQuery element containing all of the formatted HTML for the
-    // article panel
+    // Create a panel for each article/headline
     var panel = $(
       [
         "<div class='panel panel-default'>",
@@ -57,16 +55,14 @@ $(document).ready(function() {
         "</div>"
       ].join("")
     );
-    // We attach the article's id to the jQuery element
-    // We will use this when trying to figure out which article the user wants to save
+    // Add the article ID as an attribute.
     panel.data("_id", article._id);
-    // We return the constructed panel jQuery element
+    // Return the panel HTML so it can enter the articles array
     return panel;
   }
 
+  // HTML message if there are no articles to view. 
   function renderEmpty() {
-    // This function renders some HTML to the page explaining we don't have any articles to view
-    // Using a joined array of HTML string data because it's easier to read/change than a concatenated string
     var emptyAlert = $(
       [
         "<div class='alert alert-warning text-center'>",
@@ -87,10 +83,8 @@ $(document).ready(function() {
     articleContainer.append(emptyAlert);
   }
 
+  // When user wants to save an article, update the save state of the article by using the ID data attribute
   function handleArticleSave() {
-    // This function is triggered when the user wants to save an article
-    // When we rendered the article initially, we attatched a javascript object containing the headline id
-    // to the element using the .data method. Here we retrieve that.
     var articleToSave = $(this).parents(".panel").data();
     articleToSave.saved = true;
     $.ajax({
@@ -106,13 +100,10 @@ $(document).ready(function() {
   }
 
   function handleArticleScrape() {
-    // This function handles the user clicking any "scrape new article" buttons
+    // Run scrape when the "Scrape New Articles" button is clicked.
     $.get("/api/scrape").then(function(res) {
-      // If we are able to succesfully scrape the NYTIMES and compare the articles to those
-      // already in our collection, re render the articles on the page
-      // and let the user know how many unique articles we were able to save
+      // Rerender articles and display modal displaying how many articles were scraped.
       initPage();
-      console.log(res);
       bootbox.alert("<h3 class='text-center m-top-80'>" + res + "<h3>");
     });
   }
