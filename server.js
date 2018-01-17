@@ -64,15 +64,22 @@
       // Load response into cheerio
       var $ = cheerio.load(response.data);
       var count = 0;
+      var newArticles = false;
 
       // Find article (divs with class "content")
       $(".content").each(function(i, element) {
         
         // Check to see if div is not empty
-        var element = $(this).children("h1").length;
+        var contentDivLength = $(this).children("h1").length;
+        console.log(contentDivLength);
+        if (contentDivLength = 1) {
+          newArticles = true;
+        } else if (contentDivLength = 0) {
+          newArticles = false;
+        }
 
-        // If div is not empty, scrape.
-        if (element > 0) {
+        // If new articles, scrape.
+        if (newArticles) {
 
           count++;
 
@@ -88,20 +95,46 @@
           // Find article subtitle
           result.subtitle = $(this).children("div.excerpt").children("a").children("p").text();
         
-          // Create a new Article using the `result` object built from scraping
           db.Article
-            .create(result) 
+            .find({'title': result.title })
             .then(function(dbArticle) {
-              // If we were able to successfully scrape and save an Article, send a message to the client
-              if (dbArticle) {
-                res.send(`Scrape Complete. ${count} articles added.`);
+              if (dbArticle.length === 0) {
+                db.Article
+                  .create(result) 
+                  .then(function(dbArticle) {
+                    console.log(dbArticle);
+                    // If we were able to successfully scrape and save an Article, send a message to the client
+                    if (dbArticle) {
+                      newArticles = false;
+                      res.send(`Scrape Complete. ${count} articles added.`);
+                    }
+                  })
+                  .catch(function(err) {
+                  // If an error occurred, send it to the client
+                    res.send("An error has occurred.");
+                    res.json(err);
+                  });
+              } else {
+                newArticles = false;
+                console.log("old article!");
               }
             })
-            .catch(function(err) {
-              // If an error occurred, send it to the client
-              res.send("An error has occurred.");
-              res.json(err);
-          });
+
+          // // Create a new Article using the `result` object built from scraping
+          // db.Article
+          //   .create(result) 
+          //   .then(function(dbArticle) {
+          //     // If we were able to successfully scrape and save an Article, send a message to the client
+          //     if (dbArticle) {
+          //       res.send(`Scrape Complete. ${count} articles added.`);
+          //     }
+          //   })
+          //   .catch(function(err) {
+          //     // If an error occurred, send it to the client
+          //     res.send("An error has occurred.");
+          //     res.json(err);
+          // });
+
         // If no new articles, send different message back to the client.
         } else {
           res.send("No new articles. Check back again later!");
@@ -231,7 +264,7 @@
         dbArticle.remove();
       })
       .then(function(dbArticle) {
-        // If article is succesfully deleted, send response
+        // If article is succesfully deleted, send response of "true"
         res.json(true);
       })
       .catch(function(err) {

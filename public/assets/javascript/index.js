@@ -99,9 +99,13 @@ $(document).ready(function() {
     });
   }
 
+  // Scrape for new articles
   function handleArticleScrape() {
-    // Run scrape when the "Scrape New Articles" button is clicked.
-    $.get("/api/scrape").then(function(res) {
+    $.ajax({
+      method: "GET",
+      url: "/api/scrape"
+    })
+    .then(function(res) {
       // Rerender articles and display modal displaying how many articles were scraped.
       initPage();
       bootbox.alert("<h3 class='text-center m-top-80'>" + res + "<h3>");
