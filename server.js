@@ -71,17 +71,9 @@
         
         // Check to see if div is not empty
         var contentDivLength = $(this).children("h1").length;
-        console.log(contentDivLength);
-        if (contentDivLength = 1) {
-          newArticles = true;
-        } else if (contentDivLength = 0) {
-          newArticles = false;
-        }
 
-        // If new articles, scrape.
-        if (newArticles) {
-
-          count++;
+        // If div is not empty, scrape.
+        if (contentDivLength > 0) {
 
           // Save an empty result object
           var result = {};
@@ -95,49 +87,35 @@
           // Find article subtitle
           result.subtitle = $(this).children("div.excerpt").children("a").children("p").text();
         
+          // Check if article has already been scraped
           db.Article
             .find({'title': result.title })
             .then(function(dbArticle) {
+              // Add article if it does not already exist.
               if (dbArticle.length === 0) {
+                newArticles = true;
+                count++;
                 db.Article
+                  // Create a new Article using the `result` object built from scraping
                   .create(result) 
                   .then(function(dbArticle) {
-                    console.log(dbArticle);
                     // If we were able to successfully scrape and save an Article, send a message to the client
-                    if (dbArticle) {
-                      newArticles = false;
                       res.send(`Scrape Complete. ${count} articles added.`);
-                    }
                   })
-                  .catch(function(err) {
-                  // If an error occurred, send it to the client
-                    res.send("An error has occurred.");
-                    res.json(err);
-                  });
-              } else {
-                newArticles = false;
-                console.log("old article!");
+              }
+            })
+            .then(function() {
+              if (newArticles === false) {
+                res.send("No new articles. Check back again later!");
               }
             })
 
-          // // Create a new Article using the `result` object built from scraping
-          // db.Article
-          //   .create(result) 
-          //   .then(function(dbArticle) {
-          //     // If we were able to successfully scrape and save an Article, send a message to the client
-          //     if (dbArticle) {
-          //       res.send(`Scrape Complete. ${count} articles added.`);
-          //     }
-          //   })
+
           //   .catch(function(err) {
           //     // If an error occurred, send it to the client
           //     res.send("An error has occurred.");
           //     res.json(err);
           // });
-
-        // If no new articles, send different message back to the client.
-        } else {
-          res.send("No new articles. Check back again later!");
         }
       });
     })
