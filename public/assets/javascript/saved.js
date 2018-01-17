@@ -64,9 +64,8 @@ $(document).ready(function() {
         "</div>"
       ].join("")
     );
-    // Add the article ID and title as attributes.
+    // Add the article ID as an attribute.
     panel.data("_id", article._id);
-    panel.data("title", article.title);
     // Return the panel HTML so it can enter the articles array
     return panel;
   }
@@ -92,38 +91,38 @@ $(document).ready(function() {
     articleContainer.append(emptyAlert);
   }
 
+  // Create an array of notes for notes modal
   function renderNotesList(data) {
-    // This function handles rendering note list items to our notes modal
-    // Setting up an array of notes to render after finished
-    // Also setting up a currentNote variable to temporarily store each note
-    console.log(data.notes.note);
-    var notesToRender = [];
+    var notesObject = data.notes;
+    console.log(notesObject);
+
+    var notesArray = [];
     var currentNote;
-    if (!data.notes.note.length) {
+    if (notesObject.length <= 0) {
       // If we have no notes, just display a message explaing this
       currentNote = ["<li class='list-group-item'>", "No notes for this article yet.", "</li>"].join("");
-      notesToRender.push(currentNote);
+      notesArray.push(currentNote);
     }
     else {
       // If we do have notes, go through each one
-      for (var i = 0; i < data.notes.note.length; i++) {
+      // for (var i = 0; i < data.notes.note.length; i++) {
         // Constructs an li element to contain our noteText and a delete button
         currentNote = $(
           [
             "<li class='list-group-item note'>",
-            data.notes.note[i].noteText,
-            "<button class='btn btn-danger note-delete'>x</button>",
+            notesObject.noteText,
+            //"<button class='btn btn-danger note-delete'>x</button>",
             "</li>"
           ].join("")
         );
         // Store the note id on the delete button for easy access when trying to delete
-        currentNote.children("button").data("_id", data.notes.note[i]._id);
+        currentNote.children("button").data("_id", notesObject._id);
         // Adding our currentNote to the notesToRender array
-        notesToRender.push(currentNote);
-      }
+        notesArray.push(currentNote);
+      // }
     }
     // Now append the notesToRender to the note-container inside the note modal
-    $(".note-container").append(notesToRender);
+    $(".note-container").append(notesArray);
   }
 
   function handleArticleSave() {
@@ -160,17 +159,17 @@ $(document).ready(function() {
     });
   }
 
+  // Open notes modal and display notes using the ID of the article
   function handleArticleNotes() {
-    // This function handles opending the notes modal and displaying our notes
-    // We grab the id of the article to get notes for from the panel element the delete button sits inside
+    // Grab data, which contains article id, from parent div
     var currentArticle = $(this).parents(".panel").data();
-    // Grab any notes with this headline/article id
+    // Search database for ID, get back article object
     $.get("/api/articles/" + currentArticle._id).then(function(data) {
       // Constructing our initial HTML to add to the notes modal
       var modalText = [
         "<div class='container-fluid text-center'>",
         "<h4>Notes For Article: ",
-        currentArticle.title,
+        data.title,
         "</h4>",
         "<hr />",
         "<ul class='list-group note-container'>",
@@ -184,10 +183,14 @@ $(document).ready(function() {
         message: modalText,
         closeButton: true
       });
+      // Create object with article ID and note object if it exists
       var noteData = {
         _id: currentArticle._id,
-        notes: data || []
+        notes: data.note || []
       };
+      // console.log("==============");
+      // console.log(noteData);
+      // console.log("==============");      
       // Adding some information about the article and article notes to the save button for easy access
       // When trying to add a new note
       $(".btn.save").data("article", noteData);
@@ -203,8 +206,8 @@ $(document).ready(function() {
     // If data was inputted, create a note data object and post it to the API
     if (newNote) {
       noteData = {
-        _id: $(this).data("article")._id,
-        noteText: newNote
+          _id: $(this).data("article")._id,
+          noteText: newNote
       };
       $.post("/api/articles", noteData).then(function() {
         // Close the modal
