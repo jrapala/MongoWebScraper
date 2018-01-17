@@ -202,28 +202,48 @@
       });
   });
 
-  // A DELETE route for deleting article notes
-  app.delete("/api/articles/:id", function(req, res) {
-    console.log(req.body);
-    // // Grab every document in the Articles collection
-    // db.Note
-    //   .create(req.body)
-    //   .then(function(dbNote) {
-    //     return db.Article.findOneAndUpdate({ _id: dbNote._id }, { note: dbNote._id }, { new: true });
-    //   })
-    //   .then(function(dbNote) {
-    //     // If we were able to successfully find Articles, send them back to the client
-    //     res.json(dbNote);
-    //   })
-    //   .catch(function(err) {
-    //     // If an error occurred, send it to the client
-    //     res.json(err);
-    //   });
-  });
+  // // A DELETE route for deleting article notes
+  // app.delete("/api/articles/:id", function(req, res) {
+  //   console.log(req.body);
+  //   db.Note
+  //     .create(req.body)
+  //     .then(function(dbNote) {
+  //       return db.Article.findOneAndUpdate({ _id: dbNote._id }, { note: dbNote._id }, { new: true });
+  //     })
+  //     .then(function(dbNote) {
+  //       // If we were able to successfully find Articles, send them back to the client
+  //       res.json(dbNote);
+  //     })
+  //     .catch(function(err) {
+  //       // If an error occurred, send it to the client
+  //       res.json(err);
+  //     });
+  // });
+
+  // A DELETE route for deleting articles
+  app.delete("/api/articles/:id/remove", function(req, res, next) {
+    // Find article using parameter
+    db.Article
+      .findById({
+          "_id" : req.params.id
+      })
+      .then(function(dbArticle) {
+        dbArticle.remove();
+      })
+      .then(function(dbArticle) {
+        // If article is succesfully deleted, send response
+        res.json(true);
+      })
+      .catch(function(err) {
+        res.json(err);
+      });
+});
 
   // Start the server
   app.listen(PORT, function() {
     console.log("App running on port " + PORT + "!");
   });
+
+
 
 

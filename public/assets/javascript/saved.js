@@ -143,17 +143,17 @@ $(document).ready(function() {
     });
   }
 
+  // Delete an article from the database
   function handleArticleDelete() {
-    // This function handles deleting articles/headlines
-    // We grab the id of the article to delete from the panel element the delete button sits inside
+    // Take the article ID from the delete button
     var articleToDelete = $(this).parents(".panel").data();
-    // Using a delete method here just to be semantic since we are deleting an article/headline
+    // Send a delete request
     $.ajax({
       method: "DELETE",
-      url: "/api/headlines/" + articleToDelete._id
+      url: "/api/articles/" + articleToDelete._id + "/remove"
     }).then(function(data) {
-      // If this works out, run initPage again which will rerender our list of saved articles
-      if (data.ok) {
+      // If article successfully deleted, reload page
+      if (data === true) {
         initPage();
       }
     });
