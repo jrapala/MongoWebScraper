@@ -1,0 +1,67 @@
+<!-- Header
+========================================== -->
+  <header>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Mongo Scraper</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li class="active"><a href="/saved">Saved Articles</a></li>
+        </ul>
+      </div>
+  </nav>
+</header>
+
+<!-- Main
+========================================== -->
+<main>
+  <div class="jumbotron text-center">
+  		<div class="overlay">
+  		</div>
+  		<div class="background-image">
+  		</div>
+  		<div class="caption">
+  			<h1>Mongo Scraper</h1>
+  			<p>Your Saved Articles</p>
+  		</div>
+  </div>
+  <div class="container-fluid article-container">
+
+{{#if article}}
+    {{#each article}}
+
+      <div class='panel panel-default' data-_id="{{_id}}" data-saved="true">
+        <div class='panel-heading panel-heading-saved'>
+          <h3>
+            <a class='article-link' target='_blank' href='{{link}}'>{{title}}</a>
+            <a class='btn btn-default unsave'>Remove from Saved</a>
+            <a class='btn btn-info notes'>Article Notes</a>
+            <a class='btn btn-danger delete'>Delete Article</a>
+          </h3>
+        </div>
+        <div class='panel-body'>
+          {{subtitle}}
+        </div>
+      </div>
+
+    {{/each}}
+
+  </div>
+
+{{else}}
+
+  <div class='alert alert-warning text-center'>
+    <h4>Uh Oh. Looks like we don't have any saved articles.</h4>
+    </div>
+    <div class='panel panel-default'>
+      <div class='panel-heading text-center'>
+        <h3>WWould You Like to Browse Available Articles?</h3>
+      </div>
+    <div class='panel-body text-center'>
+      <h4><a href='/'>Browse Articles</a></h4>
+    </div>
+  </div>
+
+{{/if}}
