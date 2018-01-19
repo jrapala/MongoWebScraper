@@ -137,6 +137,23 @@
   });
 
   // A GET route for getting all articles from the database by status
+  app.get("/", function(req, res) {
+    //var status = req.params.status;
+    db.Article
+      .find({'saved': false })
+      .then(function(dbArticle) {
+        // If we were able to successfully find Articles, send them back to the client
+        //res.json(dbArticle);
+        // console.log(dbArticle);
+        res.render("index", { article: dbArticle });
+      })
+      .catch(function(err) {
+        // If an error occurred, send it to the client
+        res.json(err);
+      });
+  });
+
+  // A GET route for getting all articles from the database by status
   app.get("/api/articles/saved/:status", function(req, res) {
     var status = req.params.status;
     db.Article
@@ -155,6 +172,7 @@
   app.put("/api/update", function(req, res) {
     var articleId = req.body._id;
     var articleSaveStatus = req.body.saved;
+    console.log(req.body);
 
     // Update the article that matches the article id
     db.Article
@@ -168,6 +186,7 @@
       .then(function(dbArticle) {
         // If we were able to successfully find Articles, send them back to the client
         res.json(dbArticle);
+        //res.redirect("/");
       })
       .catch(function(err) {
         // If an error occurred, send it to the client

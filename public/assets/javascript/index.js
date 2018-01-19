@@ -7,59 +7,7 @@ $(document).ready(function() {
   // Event listener for scraping new articles
   $(document).on("click", ".scrape-new", handleArticleScrape);
 
-  initPage();
-
-  function initPage() {
-    // Empty the article container, run an AJAX request for any unsaved articles
-    articleContainer.empty();
-    $.get("/api/articles/saved/false").then(function(data) {
-      // If we have articles, render them to the page
-      if (data && data.length) {
-        renderArticles(data);
-      }
-      else {
-        // Otherwise render a message explaing we have no articles
-        renderEmpty();
-      }
-    });
-  }
-
-  // Create a div for each article and add them to the article container
-  function renderArticles(articles) {
-    var articleArray = [];
-    for (var i = 0; i < articles.length; i++) {
-      articleArray.push(createPanel(articles[i]));
-    }
-    // Newest articles on top
-    articleContainer.prepend(articleArray);
-  }
-
-  function createPanel(article) {
-    // Create a panel for each article/headline
-    var panel = $(
-      [
-        "<div class='panel panel-default'>",
-        "<div class='panel-heading'>",
-        "<h3>",
-        "<a class='article-link' target='_blank' href='" + article.link + "'>",
-        article.title,
-        "</a>",
-        "<a class='btn btn-success save'>",
-        "Save Article",
-        "</a>",
-        "</h3>",
-        "</div>",
-        "<div class='panel-body'>",
-        article.subtitle,
-        "</div>",
-        "</div>"
-      ].join("")
-    );
-    // Add the article ID as an attribute.
-    panel.data("_id", article._id);
-    // Return the panel HTML so it can enter the articles array
-    return panel;
-  }
+  // MAKE THIS WORK WITH HANDLEBARS
 
   // HTML message if there are no articles to view. 
   function renderEmpty() {
@@ -87,6 +35,7 @@ $(document).ready(function() {
   function handleArticleSave() {
     var articleToSave = $(this).parents(".panel").data();
     articleToSave.saved = true;
+    console.log(articleToSave);
     $.ajax({
       method: "PUT",
       url: "/api/update",
@@ -94,7 +43,7 @@ $(document).ready(function() {
     }).then(function(data) {
       if (data.ok) {
         // Reload page
-        initPage();
+        location.reload()
       }
     });
   }
@@ -107,8 +56,15 @@ $(document).ready(function() {
     })
     .then(function(res) {
       // Rerender articles and display modal displaying how many articles were scraped.
-      initPage();
       bootbox.alert("<h3 class='text-center m-top-80'>" + res + "<h3>");
+    })
+    // Reload page
+    .then(function() {
+      $.ajax({
+        method: "GET",
+        url: "/"
+      })
     });
   }
+
 });
