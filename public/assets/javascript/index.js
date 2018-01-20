@@ -183,17 +183,17 @@ $(document).ready(function() {
     }
 
   function handleNoteDelete() {
-    // This function handles the deletion of notes
-    // First we grab the id of the note we want to delete
-    // We stored this data on the delete button when we created it
+    // Get id of note that we are deleting 
     var noteId = $(this).data("_id");
-    // Perform an DELETE request to "/api/notes/" with the id of the note we're deleting as a parameter
+    // Delete request with noteid as a parameter
     $.ajax({
       url: "/api/notes/" + noteId,
       method: "DELETE"
-    }).then(function() {
-      // When done, hide the modal
-      bootbox.hideAll();
+    }).then(function(data) {
+      // If note deleted, display message
+      if (data == true) {
+        bootbox.alert("<h3 class='text-center m-top-80 scrape-message'>" + "Note deleted!" + "<h3>", function(){bootbox.hideAll();});
+      }
     });
   }
 
