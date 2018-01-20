@@ -231,13 +231,13 @@
   });
 
   // A POST route for saving article notes
-  app.post("/api/articles", function(req, res) {
-    console.log(req.body);
-    // Grab every document in the Articles collection
+  app.post("/api/articles/:id", function(req, res) {
+    var articleId = req.params.id;
+    // Create new Note
     db.Note
       .create(req.body)
       .then(function(dbNote) {
-        return db.Article.findOneAndUpdate({ _id: dbNote._id }, { note: dbNote._id }, { new: true });
+        return db.Article.findOneAndUpdate({ _id: articleId }, { note: dbNote._id }, { new: true });
       })
       .then(function(dbNote) {
         // If we were able to successfully find Articles, send them back to the client
@@ -249,23 +249,23 @@
       });
   });
 
-  // // A DELETE route for deleting article notes
-  // app.delete("/api/articles/:id", function(req, res) {
-  //   console.log(req.body);
-  //   db.Note
-  //     .create(req.body)
-  //     .then(function(dbNote) {
-  //       return db.Article.findOneAndUpdate({ _id: dbNote._id }, { note: dbNote._id }, { new: true });
-  //     })
-  //     .then(function(dbNote) {
-  //       // If we were able to successfully find Articles, send them back to the client
-  //       res.json(dbNote);
-  //     })
-  //     .catch(function(err) {
-  //       // If an error occurred, send it to the client
-  //       res.json(err);
-  //     });
-  // });
+  // A DELETE route for deleting article notes
+  app.delete("/api/notes/:noteid", function(req, res) {
+    db.Note
+      .findById({
+          "_id" : req.params.noteid
+      })
+      .then(function(dbNote) {
+        dbNote.remove(); 
+      })
+      .then(function(dbArticle) {
+        // If article is succesfully deleted, send response of "true"
+        res.json(true);
+      })
+      .catch(function(err) {
+        res.json(err);
+      });
+  });
 
   // A DELETE route for deleting articles
   app.delete("/api/articles/:id/remove", function(req, res, next) {

@@ -69,6 +69,7 @@ $(document).ready(function() {
 
   // Create an array of notes for notes modal
   function renderNotesList(data) {
+    var articleId = data._id;
     var notesObject = data.notes;
     var notesArray = [];
     var currentNote;
@@ -85,7 +86,7 @@ $(document).ready(function() {
           [
             "<li class='list-group-item note'>",
             notesObject.noteText,
-            //"<button class='btn btn-danger note-delete'>x</button>",
+            "<button class='btn btn-danger note-delete'>x</button>",
             "</li>"
           ].join("")
         );
@@ -131,7 +132,9 @@ $(document).ready(function() {
         "<ul class='list-group note-container'>",
         "</ul>",
         "<textarea placeholder='New Note' rows='4' cols='60'></textarea>",
-        "<button class='btn btn-success note-save'>Save Note</button>",
+        "<button data-id='",
+        data._id,
+        "' class='btn btn-success note-save'>Save Note</button>",
         "</div>"
       ].join("");
       // Adding the formatted HTML to the note modal
@@ -156,30 +159,37 @@ $(document).ready(function() {
   }
 
   function handleNoteSave() {
+    // Note data object
     var noteData;
+    // Get article ID
+    var articleId = $(this).attr("data-id");
     // Data from form
     var newNote = $(".bootbox-body textarea").val().trim();
-    // If data was inputted, create a note data object and post it to the API
+    // If data was inputed, update note data object and post it to the API
     if (newNote) {
       noteData = {
-          _id: $(this).data("article")._id,
           noteText: newNote
       };
-      $.post("/api/articles", noteData).then(function() {
+    }
+    $.ajax({
+      method: "POST",
+      url: "api/articles/" + articleId,
+      data: noteData
+    })
+    .then(function() {
         // Close the modal
         bootbox.alert("<h3 class='text-center m-top-80 scrape-message'>" + "Note saved!" + "<h3>", function(){bootbox.hideAll();});
       });
     }
-  }
 
   function handleNoteDelete() {
     // This function handles the deletion of notes
     // First we grab the id of the note we want to delete
     // We stored this data on the delete button when we created it
-    var noteToDelete = $(this).data("_id");
+    var noteId = $(this).data("_id");
     // Perform an DELETE request to "/api/notes/" with the id of the note we're deleting as a parameter
     $.ajax({
-      url: "/api/articles/" + noteToDelete,
+      url: "/api/notes/" + noteId,
       method: "DELETE"
     }).then(function() {
       // When done, hide the modal
